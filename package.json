@@ -1,8 +1,10 @@
-{"name": "ClassLoader",
-"description": "ClassLoader helper for nodejs",
-"version": "0.0.1",
-"dependencies":{
-    "log4js":"0.2.x"
-    },
-"main":"./ClassLoader.js"    
+{
+    "name": "ClassLoader",
+    "author":"Eldar Djafarov <eldar@djafarov.com>",
+    "description": "ClassLoader helper for nodejs",
+    "version": "0.0.1",
+    "dependencies":{
+        "log4js":"0.2.x"
+        },
+    "main":"./ClassLoader.js"
 }
