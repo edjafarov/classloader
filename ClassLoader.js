@@ -41,6 +41,12 @@ function ClassLoader(){
 		fs.openSync(partialPath, 'w+');
 		fs.writeFileSync(partialPath, source);
 	}
+    
+    
+    var natives=process.binding('natives');
+    function checkNative(moduleName){
+        return (id in natives);
+    }
 	
 	
 	return {
@@ -54,8 +60,13 @@ function ClassLoader(){
 			if (importArray) {
 				for (var i = 0; i < importArray.length; i++) {
 					var pathToImport = importArray[i].split('"')[1];
+                    if(checkNative(pathToImport)){
+     				source = source.replace('IO.import("' + pathToImport + '");', 
+					'require("'+ pathToImport +'")\n');
+                        }else{
 					source = source.replace('IO.import("' + pathToImport + '");', 
 					'/**** imported ****/\n' + this.loadJsSource(pathToImport + ".js"));
+                        }
 				}
 			}
             return source;
