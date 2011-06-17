@@ -1,10 +1,19 @@
 {
     "name": "ClassLoader",
     "author":"Eldar Djafarov <eldar@djafarov.com>",
+    "contributors": [ 
+        { "name": "Eldar Djafarov", "email": "eldar@djafarov.com" },
+    ],
     "description": "ClassLoader helper for nodejs",
     "version": "0.0.1",
     "dependencies":{
         "log4js":"0.2.x"
         },
+    "devDependencies":{
+        "vows":"0.5.x"
+        },        
+    "scripts": {
+        "test": "node ./test.js"
+    },
     "main":"./ClassLoader.js"
 }
