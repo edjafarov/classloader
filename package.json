@@ -2,7 +2,7 @@
     "name": "ClassLoader",
     "author":"Eldar Djafarov <eldar@djafarov.com>",
     "contributors": [ 
-        { "name": "Eldar Djafarov", "email": "eldar@djafarov.com" }
+        { "name": "Eldar Djafarov", "email": "djkojb@gmail.com" }
     ],
     "description": "ClassLoader helper for nodejs",
     "version": "0.0.1",
