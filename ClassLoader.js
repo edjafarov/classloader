@@ -45,7 +45,7 @@ function ClassLoader(){
     
     var natives=process.binding('natives');
     function checkNative(moduleName){
-        return (id in natives);
+        return (moduleName in natives);
     }
 	
 	
