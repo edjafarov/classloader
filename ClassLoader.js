@@ -1,6 +1,6 @@
 var fs=require("fs");
 var vm=require("vm");
-require('log4js')();
+var logger = require('log4js').getLogger();
 var util = require('util');
 
 /**
