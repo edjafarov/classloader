@@ -1,6 +1,5 @@
 var fs=require("fs");
 var vm=require("vm");
-var logger = require('log4js').getLogger();
 var util = require('util');
 /**
  * This is basic Classloader with caching compiled copies of scripts
