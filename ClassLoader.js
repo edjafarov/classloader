@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-var fs = require("fs");
-var vm = require("vm");
-require('log4js')();
-=======
 var fs=require("fs");
 var vm=require("vm");
 var logger = require('log4js').getLogger();
->>>>>>> 8d3bb402a18bdd1a764fb7d3d97a55d819bbc5e3
 var util = require('util');
 /**
  * This is basic Classloader with caching compiled copies of scripts
@@ -21,7 +15,6 @@ var util = require('util');
  * to keep track of errors and 
  */
 
-<<<<<<< HEAD
 function ClassLoader() {
     var DEPLOY_PATH = "./deploy/";
     var scripts = {};
@@ -52,37 +45,6 @@ function ClassLoader() {
     var natives = process.binding('natives');
 
     function checkNative(moduleName) {
-=======
-function ClassLoader(){
-    var DEPLOY_PATH="./deploy/";
-	var scripts={};
-    var classes={};
-	/**
-	 * TODO: create utils for writing/deleting directories and files
-	 */
-	function writeFile(path, source){
-		var dirArray = path.split("/");
-		var partialPath="";
-		for(var i=0;i<dirArray.length-1;i++){
-			partialPath+=dirArray[i] + "/";
-			try{
-				fs.statSync(partialPath);
-				if(!fs.statSync(partialPath).isDirectory()){
-					throw new Error(partialPath+"is not directory");
-				}
-			}catch(e){
-				fs.mkdirSync(partialPath, 0755);
-			}
-		}
-		partialPath+=dirArray[dirArray.length-1];
-		fs.openSync(partialPath, 'w+');
-		fs.writeFileSync(partialPath, source);
-	}
-    
-    
-    var natives=process.binding('natives');
-    function checkNative(moduleName){
->>>>>>> 8d3bb402a18bdd1a764fb7d3d97a55d819bbc5e3
         return (moduleName in natives);
     }
     return {
