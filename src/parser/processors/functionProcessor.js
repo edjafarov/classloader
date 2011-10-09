@@ -1,12 +1,16 @@
+var reader = require("../sourceReader.js");
+
+var FUNCTION = "function\\s*([\\w_]*)\\s*\\(([^\\)]*?)\\)\\s*\\{$";
+var ASSIGNED_TO = "[\\s\\.](\\w+)\\s*=\\s*";
 
 
-var simpleFunction = new RegExp(REGEXP.FUNCTION);
-var assignedFunction = new RegExp(REGEXP.ASSIGNED_TO + REGEXP.FUNCTION);
+var simpleFunction = new RegExp(FUNCTION);
+var assignedFunction = new RegExp(ASSIGNED_TO + FUNCTION);
 
 module.exports = function(scope, index, scopes, parser) {
-    var stringToTest = parser.sr.getString(0, scope.start);
+    var stringToTest = reader(parser.meta.source).getString(0, scope.start);
     if (simpleFunction.test(stringToTest)) {
-        scope.type = CONST.FUNCTION;
+        scope.type = parser.c.FUNCTION;
         var parsed = simpleFunction.exec(stringToTest);
         // check if anonimous
         scope.latestParsed = parsed[0];
@@ -21,4 +25,4 @@ module.exports = function(scope, index, scopes, parser) {
         }
         scope.argumentsSrc = parsed[2];
     }
-}
+};
