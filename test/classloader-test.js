@@ -56,4 +56,4 @@ vows.describe('classloader test').addBatch({
     }
     
 
-}).run();
+}).export(module);
