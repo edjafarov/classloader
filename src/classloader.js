@@ -2,7 +2,7 @@ var emitter = new(require('events').EventEmitter)();
 var fs = require("fs");
 var vm = require("vm");
 var path = require("path");
-
+var scopesParser = require("./parser/scopesParser.js");
 
 
 var Class = Object.create(null, {
@@ -54,19 +54,25 @@ var ClassLoader = Object.create(emitter, {
                 var newClass = Object.create(Class);
                 newClass.fileName = filePath;
                 newClass.source = source;
+                classes[filePath] = newClass;
+                return newClass;
             }
             catch (e) {
                 console.log("Probably file was not found while reading: " + e);
             }
-            return newClass;
         }
         //TODO: path variable should refer to some dir where all of them locate and probably read should try to find there. If lazyload on.
         //TODO: path normalizing/resolving so avoid duplicates of classes
     },
     check: {
         value: function(filePath) {
-            return classes[filePath];
+            return classes[filePath]?classes[filePath]:false;
         }
+    },
+    flush: {
+        value: function(filePath){
+                delete classes[filePath];
+            }
     },
     compile: {
         value: function(fileName) {
@@ -78,8 +84,7 @@ var ClassLoader = Object.create(emitter, {
             return cl;
         }
         
-    }
-    ,
+    },
     run: {
         value: function(fileName) {
             var cl = this.compile(fileName);
@@ -121,14 +126,11 @@ var ClassLoader = Object.create(emitter, {
             if(checkExports(cl.context.exports))return cl.context.exports;
             if(checkExports(cl.context.module.exports))return cl.context.module.exports;
         }    
-    },
-    parser:{
-        value: require("./parser/metaBuilder.js")
     }
-});
+})
 
 ClassLoader.on("compile",function(cl){
-        cl.meta = this.parser.getMeta(cl.source);
+        cl.meta={scopes:scopesParser(cl.source)};
     });
 
 function checkExports(exp){
@@ -138,22 +140,6 @@ function checkExports(exp){
         return exp != null;
     }
 }
-
-/* TODO: this could be interesting for auto resolving dependancies
-var vm=require("vm");
-
-process.on('uncaughtException', function (err) {
-    console.log('Caught exception: ' + err);
-    console.error("There was an internal error in Node's debugger. " +
-        'Please report this bug.');
-    console.error(err.message);
-    console.error(err.stack);
-});
-
-
-vm.createScript("var k=goo").runInNewContext({});
-*/
-
 
 
 module.exports=ClassLoader;
