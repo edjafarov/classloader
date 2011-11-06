@@ -15,7 +15,7 @@
         "vows":"0.5.x"
         },        
     "scripts": {
-        "test": "vows ./test/classloader-test.js --spec"
+        "test": "vows ./test/* --spec"
     },
     "main":"./src/classloader.js"
 }

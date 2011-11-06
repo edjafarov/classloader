@@ -23,3 +23,21 @@ function simpleClass(){
 simpleClass.prototype.someMethod = function(){
     /*some method body*/    
 }
+
+/**
+ * Comment before simpleClass2
+ */
+function simpleClass2(){
+    return {
+        /**
+        * comment before someSimple2Method
+        */
+        someSimple2Method:function(){
+            /**someSimple2Method implementations*/
+        },
+        /**
+        * comment before someSimple2property
+        */
+        someSimple2property: "someSimple2property"
+    };
+}

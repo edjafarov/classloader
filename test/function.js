@@ -6,6 +6,11 @@ function simpleFunction(){
     function innerSimpleFunction(){
         /*definition*/
     }
+    
+    var innerSimpleFunctionEx = function (){
+        /*definition*/
+    };
+
 }
 
 /**

@@ -53,7 +53,53 @@ vows.describe('classloader test').addBatch({
             assert.isNotNull(Class.context);
             assert.isNotNull(Class.context["simpleClass"]);
         }
+    },
+    'classloader returns Class': {
+        topic: function() {
+            classloader.flush("./test/simpleClass.js");
+            return classloader.getClass("./test/simpleClass.js");
+        },
+        'checked ClassObj should be runned': function(Class) {
+            assert.isNotNull(Class);
+            assert.isFunction(Class);
+        }
+    },
+    'simple function META analysis': {
+        topic: function() {
+            classloader.flush("./test/function.js");
+            return classloader.compile("./test/function.js").meta;
+        },
+        'should contain resolved simpleFunction': function(meta) {
+            assert.isTrue(meta['simpleFunction'] != undefined);
+            assert.equal(meta['simpleFunction'].type, "function");
+        },
+        'should contain resolved innerSimpleFunction': function(meta) {
+            assert.isTrue(meta['innerSimpleFunction'] != undefined);
+            assert.equal(meta['innerSimpleFunction'].type, "function");
+        },
+        'should contain resolved innerSimpleFunctionEx': function(meta) {
+            assert.isTrue(meta['innerSimpleFunctionEx'] != undefined);
+            assert.equal(meta['innerSimpleFunctionEx'].type, "function");
+        },
+        'should contain resolved simpleFunctionEx': function(meta) {
+            assert.isTrue(meta['simpleFunctionEx'] != undefined);
+            assert.equal(meta['simpleFunctionEx'].type, "function");
+        },
+        
+    },
+    'simpleClass META analysis': {
+        topic: function() {
+            classloader.flush("./test/simpleClass.js");
+            return classloader.compile("./test/simpleClass.js").meta;
+        },
+        'properties and methods of class should be returned': function(meta) {
+            assert.equal(meta["simpleClass"].type,"class");
+            assert.equal(meta["simpleClass"].name, "simpleClass");
+            assert.equal(meta["simpleClass"].properties[0].name, "simpleInsideProperty");
+            assert.equal(meta["simpleClass"].properties[1].name, "simpleInsideMethod");
+            assert.equal(meta["simpleClass"].properties[2].name, "someMethod");
+        }
     }
-    
+
 
 }).export(module);
