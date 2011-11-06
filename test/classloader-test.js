@@ -6,18 +6,18 @@ var vows = require('vows'),
 // Create a Test Suite
 vows.describe('classloader test').addBatch({
     'classloader reads': {
-        topic: classloader.read("./test/simpleClass.js"),
+        topic: classloader.read("./test_mocks/simpleClass.js"),
         'returns ClassObj with filename and source defined': function(Class) {
             assert.isNotNull(Class);
             assert.isNotNull(Class.fileName);
-            assert.equal(Class.fileName, "./test/simpleClass.js");
+            assert.equal(Class.fileName, "./test_mocks/simpleClass.js");
             assert.isNotNull(Class.source);
         }
     },
     'classloader flushes and checks': {
         topic: function() {
-            classloader.flush("./test/simpleClass.js");
-            return classloader.check("./test/simpleClass.js");
+            classloader.flush("./test_mocks/simpleClass.js");
+            return classloader.check("./test_mocks/simpleClass.js");
         },
         'checked ClassObj should be false': function(isExists) {
             assert.isFalse(isExists);
@@ -26,8 +26,8 @@ vows.describe('classloader test').addBatch({
     },
     'classloader loads and checks': {
         topic: function() {
-            classloader.read("./test/simpleClass.js");
-            return classloader.check("./test/simpleClass.js");
+            classloader.read("./test_mocks/simpleClass.js");
+            return classloader.check("./test_mocks/simpleClass.js");
         },
         'checked ClassObj should be there': function(Class) {
             assert.isObject(Class);
@@ -35,8 +35,8 @@ vows.describe('classloader test').addBatch({
     },
     'classloader compiles': {
         topic: function() {
-            classloader.flush("./test/simpleClass.js");
-            return classloader.compile("./test/simpleClass.js");
+            classloader.flush("./test_mocks/simpleClass.js");
+            return classloader.compile("./test_mocks/simpleClass.js");
         },
         'checked ClassObj should be compiled': function(Class) {
             assert.isObject(Class);
@@ -45,8 +45,8 @@ vows.describe('classloader test').addBatch({
     },
     'classloader runs': {
         topic: function() {
-            classloader.flush("./test/simpleClass.js");
-            return classloader.run("./test/simpleClass.js");
+            classloader.flush("./test_mocks/simpleClass.js");
+            return classloader.run("./test_mocks/simpleClass.js");
         },
         'checked ClassObj should be runned': function(Class) {
             assert.isObject(Class);
@@ -56,8 +56,8 @@ vows.describe('classloader test').addBatch({
     },
     'classloader returns Class': {
         topic: function() {
-            classloader.flush("./test/simpleClass.js");
-            return classloader.getClass("./test/simpleClass.js");
+            classloader.flush("./test_mocks/simpleClass.js");
+            return classloader.getClass("./test_mocks/simpleClass.js");
         },
         'checked ClassObj should be runned': function(Class) {
             assert.isNotNull(Class);
@@ -66,8 +66,8 @@ vows.describe('classloader test').addBatch({
     },
     'simple function META analysis': {
         topic: function() {
-            classloader.flush("./test/function.js");
-            return classloader.compile("./test/function.js").meta;
+            classloader.flush("./test_mocks/function.js");
+            return classloader.compile("./test_mocks/function.js").meta;
         },
         'should contain resolved simpleFunction': function(meta) {
             assert.isTrue(meta['simpleFunction'] != undefined);
@@ -89,8 +89,8 @@ vows.describe('classloader test').addBatch({
     },
     'simpleClass META analysis': {
         topic: function() {
-            classloader.flush("./test/simpleClass.js");
-            return classloader.compile("./test/simpleClass.js").meta;
+            classloader.flush("./test_mocks/simpleClass.js");
+            return classloader.compile("./test_mocks/simpleClass.js").meta;
         },
         'properties and methods of class should be returned': function(meta) {
             assert.equal(meta["simpleClass"].type,"class");

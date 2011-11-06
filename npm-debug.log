@@ -18,7 +18,7 @@ silly testEngine    { log4js: '0.3.x',
 silly testEngine      'uglify-js': '1.1.x',
 silly testEngine      traverse: '0.5.x' },
 silly testEngine   devDependencies: { vows: '0.5.x' },
-silly testEngine   scripts: { test: 'vows --spec' },
+silly testEngine   scripts: { test: 'vows ./test/* --spec' },
 silly testEngine   main: './src/classloader.js',
 silly testEngine   _id: 'ClassLoader@0.0.2',
 silly testEngine   engines: { node: '*' },
@@ -32,16 +32,16 @@ verbose run-script [ 'pretest', 'test', 'posttest' ]
 info pretest ClassLoader@0.0.2
 info test ClassLoader@0.0.2
 verbose unsafe-perm in lifecycle true
-silly exec sh "-c" "vows --spec"
+silly exec sh "-c" "vows ./test/* --spec"
 info ClassLoader@0.0.2 Failed to exec test script
-ERR! ClassLoader@0.0.2 test: `vows --spec`
-ERR! `sh "-c" "vows --spec"` failed with 127
+ERR! ClassLoader@0.0.2 test: `vows ./test/* --spec`
+ERR! `sh "-c" "vows ./test/* --spec"` failed with 127
 ERR! 
 ERR! Failed at the ClassLoader@0.0.2 test script.
 ERR! This is most likely a problem with the ClassLoader package,
 ERR! not with npm itself.
 ERR! Tell the author that this fails on your system:
-ERR!     vows --spec
+ERR!     vows ./test/* --spec
 ERR! You can get their info via:
 ERR!     npm owner ls ClassLoader
 ERR! There is likely additional logging output above.
