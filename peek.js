@@ -1,7 +1,15 @@
+var fs = require("fs");
 var util = require ("util");
+var jsparser = require("uglify-js").parser;
 
-var classloader = require("../src/classloader.js");
+var ast = jsparser.parse(fs.readFileSync("./test_mocks/simpleClass.js").toString(), false, true);
 
-var obj=classloader.compile("./test/simpleClass.js");
+var classloader = require("./src/classloader.js");
 
-console.log(util.inspect(obj.meta, false,7));
+var obj=classloader.compile("./test_mocks/simpleClass.js");
+
+
+
+
+//console.log(util.inspect(ast, false, null));
+console.log(util.inspect(obj.meta.functions, false,3));

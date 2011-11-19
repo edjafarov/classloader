@@ -3,6 +3,64 @@ var traverse = require("traverse");
 var util = require("util");
 var emitter = new(require('events').EventEmitter)();
 
+
+var Item = Object.create(null,{
+    context : {
+        value:0//global/reference to item
+    },
+    type : {
+        writable: true,
+        enumerable: true,
+        configurable: true //variable,function,method,property,class
+    },
+    properties :{
+        writable: true,
+        enumerable: true, 
+        configurable: true
+    },
+    astLeaf : {
+        writable: true,
+        enumerable: false, //show hide for debug
+        configurable: true
+    },
+    name : {
+        writable: true,
+        enumerable: true,
+        configurable: true
+    },
+    arguments : {
+        writable: true,
+        enumerable: true,
+        configurable: true
+    },
+    comments : {
+        value: []
+    },
+    Super : {
+        value : undefined //reference to superclass/method
+    }
+
+});
+
+var META = Object.create(null, {
+    globals : {
+        value : {} //global defined stuff
+    },
+    functions : {
+        value : {} // all the functions that chould be found in file
+    },
+    classes : {
+        value : {} // all classes
+    },
+    prototypes :{
+        value : {} // objects
+    },
+    dependancies : {
+        value : {} //all the dependancie necessary for file
+    }
+});
+
+
 function walkUpToFind(what, current) {
     while (current.parent.node[0] != 'toplevel') {
         if (current.node[0].name == what) return current;
@@ -15,22 +73,50 @@ module.exports = Object.create(emitter, {
         value: function(src) {
             var ast = jsparser.parse(src, false, true);
             //META all meta info here
-            var MAP = {}
+            var MAP = {};
             traverse(ast).forEach(function(node) {
                 switch (node) {
                 case "defun":
                     {
                         //this guys will be able to become Classes
-                        var newFunction = {
-                            leafId: this.parent,
-                            name: this.parent.parent.node[1],
-                            arguments: this.parent.parent.node[2],
-                            type: "function"
+                        var newFunction = Object.create(Item);
+                        newFunction.name = this.parent.parent.node[1];
+                        newFunction.arguments = this.parent.parent.node[2];
+                        newFunction.type = "function";
+                        newFunction.astLeaf = this.parent;
+
+                        // check if global
+                        if(this.parent.parent.parent.parent.node[0]=='toplevel'){
+                            META.globals[newFunction.name] = newFunction;
                         }
-                        MAP[newFunction.name] = newFunction; //TODO: maybe scope overlap
-                    };
+
+                        META.functions[newFunction.name] = newFunction; //could be overlapped
+                    }
+                case "var":
+                    {
+                        var newItem = Object.create(Item);
+                        if(this.parent.parent.node[1] instanceof Array){
+                           if(this.parent.parent.node[1][0][1][0].name == "function"){
+                               newItem.name = this.parent.parent.node[1][0][0];
+                               newItem.arguments = this.parent.parent.node[1][0][1][2];
+                               newItem.type = "function";
+                               newItem.astLeaf = this.parent.parent;
+                               META.functions[newItem.name] = newItem;
+
+                               // check if global
+                                if(this.parent.parent.parent.parent.node[0]=='toplevel'){
+                                    META.globals[newItem.name] = newItem;
+                                }                               
+                            }
+                        }
+                        //console.log(require ("util").inspect(this.parent.parent.node[1][0][1][0], null, null))
+                        //this guys will be able to become Classes
+
+
+                    }
                 case "this":
                     {
+                        var newItem = Object.create(Item);
                         if (this.parent.node[0] == "name") {
                             //if we stumble on this.{something} that means it is a class and it have property
                             var property = {
@@ -43,16 +129,19 @@ module.exports = Object.create(emitter, {
                                 }
                                 property.type = assign.node[3][0].name;
                             }
+                            
                             var classDeclaration = walkUpToFind("defun", this); //TODO: also need to check function
                             if (classDeclaration) {
                                 var className = classDeclaration.node[1];
-                                if (!MAP[className]) throw Error("we should have this function in MAP " + className);
-                                MAP[className].type = "class";
-                                if (!MAP[className].properties) MAP[className].properties = [];
-                                MAP[className].properties.push(property);
+                                if (!META.functions[className]) throw Error("we should have this function in MAP " + className);
+                                META.functions[className].type = "class";
+
+                                if (!META.functions[className].properties) META.functions[className].properties = [];
+                                META.functions[className].properties.push(property);
+                                if (!META.classes[className]) META.classes[className] = META.functions[className];
                             }
                         }
-                    };
+                    }
                 case "prototype":
                     {
                         if (this.parent.node[0] == "dot") { //every object have prototype but what I need have dot in parent
@@ -67,15 +156,16 @@ module.exports = Object.create(emitter, {
                                 }
                                 property.type = assign.node[3][0].name;
                             }
-                            if (!MAP[className]) throw Error("we should have this function in MAP " + className);
-                            MAP[className].type = "class";
-                            if (!MAP[className].properties) MAP[className].properties = [];
-                            MAP[className].properties.push(property);
+                            if (!META.functions[className]) throw Error("we should have this function in MAP " + className);
+                            META.functions[className].type = "class";
+                            if (!META.functions[className].properties) META.functions[className].properties = [];
+                            META.functions[className].properties.push(property);
+                            if (!META.classes[className]) META.classes[className] = META.functions[className];
                         }
                     }
                 }
             });
-            return MAP;
+            return META;
         }
     }
 })

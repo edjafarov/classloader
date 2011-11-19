@@ -1,4 +1,3 @@
-
 function simpleClass(){
     /**
      * comment before privateProperty
@@ -22,7 +21,7 @@ function simpleClass(){
  */
 simpleClass.prototype.someMethod = function(){
     /*some method body*/    
-}
+};
 
 /**
  * Comment before simpleClass2
