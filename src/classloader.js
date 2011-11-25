@@ -1,6 +1,7 @@
 var emitter = new(require('events').EventEmitter)();
 var fs = require("fs");
 var vm = require("vm");
+var util = require("util");
 var path = require("path");
 
 
@@ -52,6 +53,7 @@ var ClassLoader = Object.create(emitter, {
             try {
                 var source = fs.readFileSync(filePath).toString();
                 var newClass = Object.create(Class);
+
                 newClass.fileName = filePath;
                 newClass.source = source;
                 classes[filePath] = newClass;
@@ -132,11 +134,38 @@ var ClassLoader = Object.create(emitter, {
     },
     parser:{
         value: require("./parser/metaBuilder.js")
+    },
+    preload:{
+        value: function preload(path){
+            var srcFiles = sourceFolderWalker(path);
+            for(var i=0; i<srcFiles.length ;i++){
+                this.compile(srcFiles[i]);
+            }
+            console.log(util.inspect(classes, false, 4));
+            function sourceFolderWalker(rootpath){
+                var filesList=[];
+                function walker(path){
+                    path+="/";
+                    var locaDirFilesList = fs.readdirSync(path);
+                    for(var i=0; i<locaDirFilesList.length;i++){
+                        var stats = fs.statSync(path + locaDirFilesList[i]);
+                        if(stats.isFile() && locaDirFilesList[i].lastIndexOf("\.js")!=-1){
+                            filesList.push(path + locaDirFilesList[i]);
+                        }else if(stats.isDirectory()){
+                            walker(path + locaDirFilesList[i]);
+                        }
+                    }
+                }
+                walker(rootpath);
+                return filesList;
+            }
+        }
     }
 });
 
 ClassLoader.on("compile",function(cl){
         cl.meta = this.parser.getMeta(cl.source);
+
     });
 
 function checkExports(exp){

@@ -4,9 +4,13 @@ var util = require("util");
 var emitter = new(require('events').EventEmitter)();
 
 
+
+
 var Item = Object.create(null,{
     context : {
-        value:0//global/reference to item
+        writable: true,
+        enumerable: true,
+        configurable: true //variable,function,method,property,class
     },
     type : {
         writable: true,
@@ -42,21 +46,31 @@ var Item = Object.create(null,{
 
 });
 
-var META = Object.create(null, {
+var METACORE = Object.create({}, {
     globals : {
-        value : {} //global defined stuff
+        writable: true,
+        enumerable: true,
+        configurable: true
     },
     functions : {
-        value : {} // all the functions that chould be found in file
+        writable: true,
+        enumerable: true,
+        configurable: true
     },
     classes : {
-        value : {} // all classes
+        writable: true,
+        enumerable: true,
+        configurable: true
     },
     prototypes :{
-        value : {} // objects
+        writable: true,
+        enumerable: true,
+        configurable: true
     },
     dependancies : {
-        value : {} //all the dependancie necessary for file
+        writable: true,
+        enumerable: true,
+        configurable: true
     }
 });
 
@@ -71,9 +85,14 @@ function walkUpToFind(what, current) {
 module.exports = Object.create(emitter, {
     getMeta: {
         value: function(src) {
+
+            //TODO: this kinda wierd. Need to understand clonong of objects better to proceed
+            var META = Object.create(METACORE);
+            META.functions = {};
+            META.globals = {};
+            META.classes = {};
+
             var ast = jsparser.parse(src, false, true);
-            //META all meta info here
-            var MAP = {};
             traverse(ast).forEach(function(node) {
                 switch (node) {
                 case "defun":
@@ -84,6 +103,10 @@ module.exports = Object.create(emitter, {
                         newFunction.arguments = this.parent.parent.node[2];
                         newFunction.type = "function";
                         newFunction.astLeaf = this.parent;
+                        if(this.parent.node.start.comments_before.length > 0 ){
+                            newFunction.comments = this.parent.node.start.comments_before;
+                        }
+
 
                         // check if global
                         if(this.parent.parent.parent.parent.node[0]=='toplevel'){
@@ -102,6 +125,10 @@ module.exports = Object.create(emitter, {
                                newItem.type = "function";
                                newItem.astLeaf = this.parent.parent;
                                META.functions[newItem.name] = newItem;
+
+                               if(this.parent.node.start.comments_before.length > 0 ){
+                                   newItem.comments = this.parent.node.start.comments_before;
+                               }
 
                                // check if global
                                 if(this.parent.parent.parent.parent.node[0]=='toplevel'){
@@ -168,4 +195,5 @@ module.exports = Object.create(emitter, {
             return META;
         }
     }
-})
+});
+

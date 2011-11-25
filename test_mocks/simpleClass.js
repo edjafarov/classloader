@@ -1,3 +1,6 @@
+/**
+ * comment before simpleClass
+ */
 function simpleClass(){
     /**
      * comment before privateProperty
