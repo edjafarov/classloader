@@ -72,22 +72,22 @@ vows.describe('classloader test').addBatch({
         'should contain resolved simpleFunction': function(meta) {
             assert.isTrue(meta.functions['simpleFunction'] != undefined);
             assert.equal(meta.functions['simpleFunction'].type, "function", "should be a function");
-           assert.length(meta.functions['simpleFunction'].comments, 1, "should contain a comment");
+           assert.equal(meta.functions['simpleFunction'].comments.length, 1, "should contain a comment");
         },
         'should contain resolved innerSimpleFunction': function(meta) {
             assert.isTrue(meta.functions['innerSimpleFunction'] != undefined);
             assert.equal(meta.functions['innerSimpleFunction'].type, "function", "should be a function");
-            assert.length(meta.functions['innerSimpleFunction'].comments, 1, "should contain a comment");
+            assert.equal(meta.functions['innerSimpleFunction'].comments.length, 1, "should contain a comment");
         },
         'should contain resolved innerSimpleFunctionEx': function(meta) {
             assert.isTrue(meta.functions['innerSimpleFunctionEx'] != undefined);
             assert.equal(meta.functions['innerSimpleFunctionEx'].type, "function", "should be a function");
-            assert.length(meta.functions['innerSimpleFunctionEx'].comments, 1, "should contain a comment");
+            assert.equal(meta.functions['innerSimpleFunctionEx'].comments.length, 1, "should contain a comment");
         },
         'should contain resolved simpleFunctionEx': function(meta) {
             assert.isTrue(meta.functions['simpleFunctionEx'] != undefined);
             assert.equal(meta.functions['simpleFunctionEx'].type, "function", "should be a function");
-            assert.length(meta.functions['simpleFunctionEx'].comments, 1, "should contain a comment");
+            assert.equal(meta.functions['simpleFunctionEx'].comments.length, 1, "should contain a comment");
         }
     },
     'simpleClass META analysis': {

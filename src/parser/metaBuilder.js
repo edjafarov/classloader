@@ -130,13 +130,13 @@ module.exports = Object.create(emitter, {
                                    newItem.comments = this.parent.node.start.comments_before;
                                }
 
-                               // check if global
+                               //TODO: check if global
                                 if(this.parent.parent.parent.parent.node[0]=='toplevel'){
                                     META.globals[newItem.name] = newItem;
                                 }                               
                             }
                         }
-                        //console.log(require ("util").inspect(this.parent.parent.node[1][0][1][0], null, null))
+
                         //this guys will be able to become Classes
 
 
@@ -160,9 +160,8 @@ module.exports = Object.create(emitter, {
                             var classDeclaration = walkUpToFind("defun", this); //TODO: also need to check function
                             if (classDeclaration) {
                                 var className = classDeclaration.node[1];
-                                if (!META.functions[className]) throw Error("we should have this function in MAP " + className);
+                                if (!META.functions[className] && !META.classes[className]) throw Error("we should have this function in MAP " + className);
                                 META.functions[className].type = "class";
-
                                 if (!META.functions[className].properties) META.functions[className].properties = [];
                                 META.functions[className].properties.push(property);
                                 if (!META.classes[className]) META.classes[className] = META.functions[className];
