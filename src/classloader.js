@@ -45,6 +45,8 @@ var Class = Object.create(null, {
 })
 // cache
 var classes = {};
+var globalNames = {};
+
 var ClassLoader = Object.create(emitter, {
     read: {
         value: function(filePath) {
@@ -125,6 +127,12 @@ var ClassLoader = Object.create(emitter, {
             var cl = this.run(fileName);
             
             if(!checkExports(cl.context.exports) && !checkExports(cl.context.module.exports)){
+                if(cl.context[path.basename(fileName,".js")]){
+                    if(!cl.meta.globals[path.basename(fileName,".js")]){
+                        util.log("Warning! the globals from context are not resolved!!!!");
+                    }
+                    return cl.context[path.basename(fileName,".js")];
+                }
                 //throw Error("no exports to return from: " + fileName);
                 return false;
             }
@@ -137,11 +145,23 @@ var ClassLoader = Object.create(emitter, {
     },
     preload:{
         value: function preload(path){
+            util.log("preloading .js files in path:'" + path + "'" );
             var srcFiles = sourceFolderWalker(path);
             for(var i=0; i<srcFiles.length ;i++){
+                util.log("precompiling :'" + srcFiles[i] + "'" );
                 this.compile(srcFiles[i]);
             }
-            console.log(util.inspect(classes, false, 4));
+
+            for(className in classes){
+                for(globalName in classes[className].meta.globals){
+                    globalNames[globalName] = {
+                        classRef :  classes[className],
+                        meta : classes[className].meta.globals[globalName]
+                    }
+                }
+
+            }
+            return globalNames;
             function sourceFolderWalker(rootpath){
                 var filesList=[];
                 function walker(path){
@@ -162,6 +182,8 @@ var ClassLoader = Object.create(emitter, {
         }
     }
 });
+
+
 
 ClassLoader.on("compile",function(cl){
         cl.meta = this.parser.getMeta(cl.source);

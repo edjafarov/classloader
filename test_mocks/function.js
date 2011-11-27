@@ -1,5 +1,6 @@
 /**
  * comment before simpleFunction
+ * @simpleFunctionAnnotation(var1='var1Value',var2='var2Value')
  */
 function simpleFunction(){
 

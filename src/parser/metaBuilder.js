@@ -46,33 +46,6 @@ var Item = Object.create(null,{
 
 });
 
-var METACORE = Object.create({}, {
-    globals : {
-        writable: true,
-        enumerable: true,
-        configurable: true
-    },
-    functions : {
-        writable: true,
-        enumerable: true,
-        configurable: true
-    },
-    classes : {
-        writable: true,
-        enumerable: true,
-        configurable: true
-    },
-    prototypes :{
-        writable: true,
-        enumerable: true,
-        configurable: true
-    },
-    dependancies : {
-        writable: true,
-        enumerable: true,
-        configurable: true
-    }
-});
 
 
 function walkUpToFind(what, current) {
@@ -87,10 +60,13 @@ module.exports = Object.create(emitter, {
         value: function(src) {
 
             //TODO: this kinda wierd. Need to understand clonong of objects better to proceed
-            var META = Object.create(METACORE);
-            META.functions = {};
-            META.globals = {};
-            META.classes = {};
+            var META = {
+                globals : {},
+                functions : {},
+                classes : {},
+                methods :{}
+            };
+
 
             var ast = jsparser.parse(src, false, true);
             traverse(ast).forEach(function(node) {
@@ -105,6 +81,7 @@ module.exports = Object.create(emitter, {
                         newFunction.astLeaf = this.parent;
                         if(this.parent.node.start.comments_before.length > 0 ){
                             newFunction.comments = this.parent.node.start.comments_before;
+                            newFunction.annotations = parseAnnotations(newFunction.comments);
                         }
 
 
@@ -128,6 +105,7 @@ module.exports = Object.create(emitter, {
 
                                if(this.parent.node.start.comments_before.length > 0 ){
                                    newItem.comments = this.parent.node.start.comments_before;
+                                   newItem.annotations = parseAnnotations(newItem.comments);
                                }
 
                                //TODO: check if global
@@ -153,6 +131,7 @@ module.exports = Object.create(emitter, {
                             if (assign) { //check comments before property
                                 if (assign.node[0].start.comments_before && assign.node[0].start.comments_before.length > 0) {
                                     property.comments = assign.node[0].start.comments_before;
+                                    property.annotations = parseAnnotations(property.comments);
                                 }
                                 property.type = assign.node[3][0].name;
                             }
@@ -163,6 +142,8 @@ module.exports = Object.create(emitter, {
                                 if (!META.functions[className] && !META.classes[className]) throw Error("we should have this function in MAP " + className);
                                 META.functions[className].type = "class";
                                 if (!META.functions[className].properties) META.functions[className].properties = [];
+                                property.classRef = className;
+                                META.methods[property.name] = property;
                                 META.functions[className].properties.push(property);
                                 if (!META.classes[className]) META.classes[className] = META.functions[className];
                             }
@@ -179,12 +160,15 @@ module.exports = Object.create(emitter, {
                             if (assign) { //check comments before property
                                 if (assign.node[0].start.comments_before && assign.node[0].start.comments_before.length > 0) {
                                     property.comments = assign.node[0].start.comments_before;
+                                    property.annotations = parseAnnotations(property.comments);
                                 }
                                 property.type = assign.node[3][0].name;
                             }
-                            if (!META.functions[className]) throw Error("we should have this function in MAP " + className);
+                            if (!META.functions[className]) throw Error("we should have this function in META " + className);
                             META.functions[className].type = "class";
                             if (!META.functions[className].properties) META.functions[className].properties = [];
+                            property.classRef = className;
+                            META.methods[property.name] = property;
                             META.functions[className].properties.push(property);
                             if (!META.classes[className]) META.classes[className] = META.functions[className];
                         }
@@ -196,3 +180,46 @@ module.exports = Object.create(emitter, {
     }
 });
 
+var ANNOT_TOKEN_REG = new RegExp("@(\\w+)");
+var ANNOT_VARS_REG = new RegExp("\\((.*)\\)");
+var ANNOTATION_REG = new RegExp("@(.+)\\n", "g");
+
+function parseAnnotations(comment){
+    var annot;
+    for(var i=0; i< comment.length; i++){
+        var checkAnnot = comment[i].value.match(ANNOTATION_REG);
+        if(checkAnnot){
+            checkAnnot.forEach(
+                function(annotationString){
+                    var annotationToken = ANNOT_TOKEN_REG.exec(annotationString)[1];
+                    if(!annot) annot = {};
+                    annot[annotationToken] = {};
+                    if(ANNOT_VARS_REG.test(annotationString)){
+                        var vars = ANNOT_VARS_REG.exec(annotationString)[1];
+                        var varsArray = vars.split(",");
+                        varsArray.forEach(function(pair, i, pairs) {
+                            var res = pair.split("=");
+                            if (res[0] && res[1]) {
+                                annot[annotationToken][trim(res[0])] = trim(res[1]);
+                            }
+                        })
+                    }
+                }
+            );
+        }
+
+    }
+    return annot;
+}
+
+//todo: need to cleanup following code - looks ugly
+function trim(str) {
+    str = str.replace(/^[\s"']+/, '');
+    for (var i = str.length - 1; i >= 0; i--) {
+        if (/[^\s"']/.test(str.charAt(i))) {
+            str = str.substring(0, i + 1);
+            break;
+        }
+    }
+    return str;
+}

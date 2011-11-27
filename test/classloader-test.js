@@ -59,9 +59,9 @@ vows.describe('classloader test').addBatch({
             classloader.flush("./test_mocks/simpleClass.js");
             return classloader.getClass("./test_mocks/simpleClass.js");
         },
-        'checked ClassObj should be runned': function(Class) {
+        'checked ClassObj should be a function/constructor': function(Class) {
             assert.isNotNull(Class);
-            //assert.isFunction(Class);
+            assert.isFunction(Class);
         }
     },
     'simple function META analysis': {
@@ -73,6 +73,8 @@ vows.describe('classloader test').addBatch({
             assert.isTrue(meta.functions['simpleFunction'] != undefined);
             assert.equal(meta.functions['simpleFunction'].type, "function", "should be a function");
            assert.equal(meta.functions['simpleFunction'].comments.length, 1, "should contain a comment");
+           assert.deepEqual(meta.functions['simpleFunction'].annotations["simpleFunctionAnnotation"],
+               { var1:'var1Value', var2: 'var2Value' }, "should parse annotations");
         },
         'should contain resolved innerSimpleFunction': function(meta) {
             assert.isTrue(meta.functions['innerSimpleFunction'] != undefined);
