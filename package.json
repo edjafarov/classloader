@@ -5,7 +5,7 @@
         { "name": "Eldar Djafarov", "email": "djkojb@gmail.com" }
     ],
     "description": "classloader helper for nodejs",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dependencies":{
         "log4js":"0.3.x",
         "uglify-js":"1.1.x",
