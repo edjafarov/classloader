@@ -14,7 +14,7 @@ function simpleClass(){
     /**
      * comment before simpleInsideMethod
      */
-    this.simpleInsideMethod = function(){
+    this.simpleInsideMethod = function(arg){
         /*method body*/    
     };
 }
@@ -22,7 +22,7 @@ function simpleClass(){
 /**
  * comment before someMethod
  */
-simpleClass.prototype.someMethod = function(){
+simpleClass.prototype.someMethod = function(argument){
     /*some method body*/    
 };
 

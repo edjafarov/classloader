@@ -134,6 +134,9 @@ module.exports = Object.create(emitter, {
                                     property.annotations = parseAnnotations(property.comments);
                                 }
                                 property.type = assign.node[3][0].name;
+                                if(property.type == "function"){
+                                    property.arguments = this.parent.parent.node[3];
+                                }
                             }
                             
                             var classDeclaration = walkUpToFind("defun", this); //TODO: also need to check function
@@ -163,6 +166,9 @@ module.exports = Object.create(emitter, {
                                     property.annotations = parseAnnotations(property.comments);
                                 }
                                 property.type = assign.node[3][0].name;
+                                if(property.type == "function"){
+                                    property.arguments = assign.node[3][2];
+                                }
                             }
                             if (!META.functions[className]) throw Error("we should have this function in META " + className);
                             META.functions[className].type = "class";
